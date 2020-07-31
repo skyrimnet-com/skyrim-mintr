@@ -1,4 +1,7 @@
-# skyrim-mintr
+# skyrim-mintr  
+
+## Code update in progress, so stay tuned.  
+
 
 ## Project setup
 ```
