@@ -1,32 +1,56 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <top-nav></top-nav>
+    <router-view></router-view>
+    <footer-nav></footer-nav>
   </div>
 </template>
 
-<style lang="scss">
+<script>
+import TopNav from "./components/common/TopNav";
+import FooterNav from "./components/common/Footer";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.min.js";
+
+export default {
+  name: 'app',
+  components: {
+    FooterNav,
+    TopNav
+  }
+}
+</script>
+
+<style>
+html {
+  height: 100%;
+}
+body {
+  height: 100%;
+  background-color: #0c0b17;
+}
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'FZQingKeBenYueSongS-R-GB', PingFang SC, 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  color: #ffffff;
 }
 
-#nav {
-  padding: 30px;
+/* container width set 1280px */
+.container-fluid {
+  padding-right: 0;
+  padding-left: 0;
+}
+.row {
+  max-width: 1280px;
+  margin: 0 auto !important;
+}
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+.swiper-pagination-bullet-active {
+  background: #DFAF57 !important;
+}
+.swiper-pagination-bullet {
+  width: 12px !important;
+  height: 12px !important;
 }
 </style>
