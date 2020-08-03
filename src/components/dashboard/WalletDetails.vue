@@ -11,7 +11,7 @@
     <div class="row wallet-div ratio-div">
       <div class="col">
         <div class="row">
-          <div class="col text-center txt-ratio-tit">7500%</div>
+          <div class="col text-center txt-ratio-tit">{{mintingRate * 100}} %</div>
         </div>
         <div class="row">
           <div class="col text-center txt-ratio-txt">Target collateralization ratio</div>
@@ -34,15 +34,15 @@
       <div class="col">
         <div class="row">
           <div class="col text-left token-price">TOTAL SNS:</div>
-          <div class="col text-right token-price">0 SNS</div>
+          <div class="col text-right token-price">{{totalSNS}} SNS</div>
         </div>
         <hr class="total-hr">
         <div class="row">
           <div class="col text-left lock-tran-txt">
-            Locked: 0
+            Locked: {{lockedSNS}}
           </div>
           <div class="col text-right lock-tran-txt">
-            Transferable: 0
+            Transferable: {{snsBalance}}
           </div>
         </div>
         <div class="row">
@@ -62,32 +62,32 @@
             <img class="balance-logo" :src="'/static/logo/sns-icon.png'" alt="SNS"/>
             SNS
           </div>
-          <div class="col text-right">0</div>
-          <div class="col text-right">0 USD</div>
+          <div class="col text-right">{{snsBalance}}</div>
+<!--          <div class="col text-right">0 USD</div>-->
         </div>
         <div class="row balance-item-2">
           <div class="col">
             <img class="balance-logo" :src="'/static/token/ETH.svg'" alt="ETH"/>
             ETH
           </div>
-          <div class="col text-right">0</div>
-          <div class="col text-right">0 USD</div>
+          <div class="col text-right">{{ethBalance}}</div>
+<!--          <div class="col text-right">0 USD</div>-->
         </div>
         <div class="row balance-item-1">
           <div class="col">
             <img class="balance-logo" :src="'/static/logo/sns-icon.png'" alt="SNS"/>
             Synths
           </div>
-          <div class="col text-right">0</div>
-          <div class="col text-right">0 USD</div>
+          <div class="col text-right">{{synBalance}}</div>
+<!--          <div class="col text-right">0 USD</div>-->
         </div>
         <div class="row balance-item-2">
           <div class="col">
             <img class="balance-logo" :src="'/static/logo/sns-icon.png'" alt="SNS"/>
             Debt
           </div>
-          <div class="col text-right">0</div>
-          <div class="col text-right">0 USD</div>
+          <div class="col text-right">{{lockedSNS}}</div>
+<!--          <div class="col text-right">0 USD</div>-->
         </div>
       </div>
     </div>
@@ -106,9 +106,71 @@
 </template>
 
 <script>
-export default {
-  name: "WalletDetails"
-}
+  import skyrim from "../../utils/skyrim/skyrim";
+  import {syntheticAddr} from "../../utils/skyrim/constant";
+  import Decimal from "decimal.js"
+
+  let opt = skyrim.opt
+  let querying = false
+
+  async function commonBalance(balanceFunc, addr) {
+    return await balanceFunc(addr)
+            .then(r=>{
+              if(r === null) {
+                return "0"
+              }
+              return r
+            })
+  }
+
+  export default {
+    name: "WalletDetails",
+
+    mounted() {
+      setInterval(async _=>{
+        if(querying) {
+          return
+        }
+
+        querying = true
+
+        this.snsBalance = await commonBalance(opt.snsBalance)
+        this.ethBalance = await commonBalance(opt.ethBalance)
+        this.mintingRate = await commonBalance(opt.currentMintingRate, syntheticAddr)
+        this.synBalance = await commonBalance(opt.synAssetsBalance, syntheticAddr)
+        this.lockedSNS = await commonBalance(opt.lockedSNSFor, syntheticAddr)
+
+        querying = false
+      }, 1000)
+    },
+
+    data() {
+      return {
+        mintingRate: "0",
+        snsBalance: "0",
+        ethBalance: "0",
+        synBalance: "0",
+        lockedSNS: "0",
+      }
+    },
+
+    computed: {
+      totalSNS() {
+        return new Decimal(this.snsBalance).add(this.lockedSNS).toDP(6, Decimal.ROUND_DOWN)
+      }
+    },
+
+    methods: {
+      // get
+      async getRatio() {
+        return opt.currentMintingRate(syntheticAddr)
+      },
+
+      async getBalance() {
+
+      }
+    }
+  }
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>

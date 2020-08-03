@@ -39,11 +39,29 @@
 </template>
 
 <script>
+import skyrim from "../../utils/skyrim/skyrim";
+
 export default {
   name: "Wallet",
   methods: {
     openMetamask() {
-      this.$router.push({name: "Dashboard"});
+      //wallet connect
+      if(!skyrim.wallet.isConnected()) {
+        skyrim.wallet.connect()
+          .then(r=>{
+            if(r === null) {
+              //not connect, do nothing
+              return
+            }
+            this.$router.push({name: "Dashboard"})
+          })
+          .catch(()=>{
+            //unknown error, do nothing
+          })
+      } else {
+        //already connected
+        this.$router.push({name: "Dashboard"})
+      }
     },
     openWalletConnect() {
       this.$router.push({name: "Dashboard"});

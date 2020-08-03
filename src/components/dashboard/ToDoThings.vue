@@ -6,14 +6,14 @@
     </div>
 
     <div class="row text-center">
-      <div class="col like-to-do-div">
+      <div class="col like-to-do-div" @click="mint">
         <div>
           <img class="like-to-do-logo" :src="'/static/like-to-do/mint.svg'" alt="SNS"/>
         </div>
         <div class="like-to-do-tit">MINT</div>
         <div class="like-to-do-txt">Mint sETH by staking SNS</div>
       </div>
-      <div class="col like-to-do-div">
+      <div class="col like-to-do-div" @click="unlock">
         <div>
           <img class="like-to-do-logo" :src="'/static/like-to-do/burn.svg'" alt="SNS"/>
         </div>
@@ -43,9 +43,63 @@
 </template>
 
 <script>
-export default {
-  name: "ToDoThings"
-}
+  import skyrim from "../../utils/skyrim/skyrim";
+  import {syntheticAddr} from "../../utils/skyrim/constant";
+
+  let opt = skyrim.opt
+  export default {
+    name: "ToDoThings",
+    methods: {
+      async mint(synAmount) {
+        let enabled = await opt.syntheticEnabled(syntheticAddr)
+        if(!enabled) {
+          //todo: go to enable page
+          //todo: this i enable method
+          let enableReq = await opt.enableSynthetic(syntheticAddr)
+          if(enableReq) {
+            console.log("send enable synthetic assets tx success: ", enableReq)
+          } else {
+            //user cancel or other unknown things happened, do nothing
+          }
+          return
+        }
+
+        //todo: get amount by user input
+        synAmount = 10
+
+        let validMint = await opt.hasEnoughToLock(syntheticAddr, synAmount)
+        if(!validMint) {
+          //todo: tell user dos not has enough SNS to lock
+          return
+        }
+
+        let mintResult = await opt.mint(syntheticAddr, synAmount)
+        if(mintResult !== null){
+          console.log("mint transaction send success, tx hash is: ", mintResult)
+        } else {
+          //user cancel or other unknown things happened, do nothing
+        }
+      },
+
+      async unlock(snsAmount) {
+        //todo: get unlock amount by user input
+        snsAmount = 5
+
+        let validUnlock = await opt.validUnlock(syntheticAddr, snsAmount)
+        if(!validUnlock) {
+          //todo: tell user unlock not valid
+          return
+        }
+
+        let unlockResult = await opt.redeem(syntheticAddr, snsAmount)
+        if(unlockResult !== null){
+          console.log("mint transaction send success, tx hash is: ", unlockResult)
+        } else {
+          //user cancel or other unknown things happened, do nothing
+        }
+      }
+    }
+  }
 </script>
 
 <style scoped>

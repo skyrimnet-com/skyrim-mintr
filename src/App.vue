@@ -11,12 +11,17 @@ import TopNav from "./components/common/TopNav";
 import FooterNav from "./components/common/Footer";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
+import skyrim from "./utils/skyrim/skyrim";
+import {snsAddr} from "./utils/skyrim/constant";
 
 export default {
   name: 'app',
   components: {
     FooterNav,
     TopNav
+  },
+  mounted() {
+    skyrim.opt.load(snsAddr)
   }
 }
 </script>
