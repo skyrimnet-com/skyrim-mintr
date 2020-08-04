@@ -35,17 +35,41 @@
         </div>
       </div>
     </div>
+
+    <a-modal
+        title=""
+        :visible="visible"
+        :closable="false"
+        :centered="true"
+        :maskClosable="false"
+        :ok-button-props="{ props: { disabled: true } }"
+        @cancel="handleCancel"
+    >
+      <p>{{ ConnectWalletModalText }}</p>
+    </a-modal>
   </div>
 </template>
 
 <script>
 import skyrim from "../../utils/skyrim/skyrim";
+import 'ant-design-vue/dist/antd.css';
 
 export default {
   name: "Wallet",
+  data() {
+    return {
+      ConnectWalletModalText: 'Waiting for connection',
+      visible: false,
+    };
+  },
   methods: {
+    handleCancel(e) {
+      this.visible = false;
+    },
     openMetamask() {
       //wallet connect
+      this.visible = true;
+
       if(!skyrim.wallet.isConnected()) {
         skyrim.wallet.connect()
           .then(r=>{
@@ -53,6 +77,7 @@ export default {
               //not connect, do nothing
               return
             }
+            this.visible = false;
             this.$router.push({name: "Dashboard"})
           })
           .catch(()=>{
@@ -60,13 +85,14 @@ export default {
           })
       } else {
         //already connected
+        this.visible = false;
         this.$router.push({name: "Dashboard"})
       }
     },
     openWalletConnect() {
       this.$router.push({name: "Dashboard"});
     }
-  }
+  },
 }
 </script>
 

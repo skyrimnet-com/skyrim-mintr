@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 
-const _import = file => () => import("@/components/" + file + ".vue");
+const _import = file => () => import("@/views/" + file + ".vue");
 Vue.use(Router);
 
 const routes = [

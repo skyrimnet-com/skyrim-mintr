@@ -5,15 +5,15 @@
       <div class="col wallet-detail-tit">What would you like to do?</div>
     </div>
 
-    <div class="row text-center">
-      <div class="col like-to-do-div" @click="mint">
+    <div class="row text-center" v-show="!toDoThingsViewDisabled">
+      <div class="col like-to-do-div" @click="viewMint">
         <div>
           <img class="like-to-do-logo" :src="'/static/like-to-do/mint.svg'" alt="SNS"/>
         </div>
         <div class="like-to-do-tit">MINT</div>
         <div class="like-to-do-txt">Mint sETH by staking SNS</div>
       </div>
-      <div class="col like-to-do-div" @click="unlock">
+      <div class="col like-to-do-div" @click="viewBurn">
         <div>
           <img class="like-to-do-logo" :src="'/static/like-to-do/burn.svg'" alt="SNS"/>
         </div>
@@ -22,15 +22,15 @@
       </div>
     </div>
 
-    <div class="row text-center">
-      <div class="col like-to-do-div">
+    <div class="row text-center" v-show="!toDoThingsViewDisabled">
+      <div class="col like-to-do-div" @click="comingSoon">
         <div>
           <img class="like-to-do-logo" :src="'/static/like-to-do/transfer.svg'" alt="SNS"/>
         </div>
         <div class="like-to-do-tit">TRANSFER</div>
         <div class="like-to-do-txt">Transfer SNS, Synths, or ETH</div>
       </div>
-      <div class="col like-to-do-div">
+      <div class="col like-to-do-div" @click="comingSoon">
         <div>
           <img class="like-to-do-logo" :src="'/static/like-to-do/track.svg'" alt="SNS"/>
         </div>
@@ -39,66 +39,70 @@
       </div>
     </div>
 
+    <div class="row" v-show="toDoThingsViewDisabled">
+      <div class="col">
+        <input type="submit" class="btn btn-info btn-cancel" value="Cancel"
+               @click="cancel"
+        >
+      </div>
+    </div>
+
+    <mint v-show="!mintDisabled"></mint>
+
+    <burn v-show="!burnDisabled"></burn>
+
+    <a-modal
+        title=""
+        :visible="visible"
+        :closable="false"
+        :centered="true"
+        :cancel-button-props="{ props: { disabled: true } }"
+        @ok="handleCancel"
+    >
+      <p>{{ comingSoonModalText }}</p>
+    </a-modal>
+
   </div>
 </template>
 
 <script>
-  import skyrim from "../../utils/skyrim/skyrim";
-  import {syntheticAddr} from "../../utils/skyrim/constant";
+  import Mint from "./Mint"
+  import Burn from "./Burn"
+  import 'ant-design-vue/dist/antd.css';
 
-  let opt = skyrim.opt
   export default {
     name: "ToDoThings",
-    methods: {
-      async mint(synAmount) {
-        let enabled = await opt.syntheticEnabled(syntheticAddr)
-        if(!enabled) {
-          //todo: go to enable page
-          //todo: this i enable method
-          let enableReq = await opt.enableSynthetic(syntheticAddr)
-          if(enableReq) {
-            console.log("send enable synthetic assets tx success: ", enableReq)
-          } else {
-            //user cancel or other unknown things happened, do nothing
-          }
-          return
-        }
-
-        //todo: get amount by user input
-        synAmount = 10
-
-        let validMint = await opt.hasEnoughToLock(syntheticAddr, synAmount)
-        if(!validMint) {
-          //todo: tell user dos not has enough SNS to lock
-          return
-        }
-
-        let mintResult = await opt.mint(syntheticAddr, synAmount)
-        if(mintResult !== null){
-          console.log("mint transaction send success, tx hash is: ", mintResult)
-        } else {
-          //user cancel or other unknown things happened, do nothing
-        }
-      },
-
-      async unlock(snsAmount) {
-        //todo: get unlock amount by user input
-        snsAmount = 5
-
-        let validUnlock = await opt.validUnlock(syntheticAddr, snsAmount)
-        if(!validUnlock) {
-          //todo: tell user unlock not valid
-          return
-        }
-
-        let unlockResult = await opt.redeem(syntheticAddr, snsAmount)
-        if(unlockResult !== null){
-          console.log("mint transaction send success, tx hash is: ", unlockResult)
-        } else {
-          //user cancel or other unknown things happened, do nothing
-        }
+    data() {
+      return {
+        toDoThingsViewDisabled: false,
+        mintDisabled: true,
+        burnDisabled: true,
+        comingSoonModalText: 'Coming Soon!',
+        visible: false,
       }
-    }
+    },
+    methods: {
+      handleCancel(e) {
+        this.visible = false;
+      },
+      viewMint() {
+        this.toDoThingsViewDisabled = true
+        this.mintDisabled = false
+      },
+      viewBurn() {
+        this.toDoThingsViewDisabled = true
+        this.burnDisabled = false
+      },
+      cancel() {
+        this.toDoThingsViewDisabled = false
+        this.mintDisabled = true
+        this.burnDisabled = true
+      },
+      comingSoon() {
+        this.visible = true;
+      }
+    },
+    components: { Mint, Burn }
   }
 </script>
 
@@ -151,5 +155,27 @@
   color: rgb(255, 255, 255);
   letter-spacing: 2px;
   margin: 30px 0 20px !important;
+}
+
+.btn-cancel {
+  background-color: transparent;
+  height: 40px;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  justify-content: space-between;
+  font-size: 14px;
+  cursor: pointer;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(38, 36, 57);
+  border-image: initial;
+  padding: 2px 20px 0;
+  border-radius: 20px;
+  transition: all 0.1s ease-in 0s;
+  text-decoration: none;
+  color: #c2c2de;
+  float: right;
 }
 </style>
