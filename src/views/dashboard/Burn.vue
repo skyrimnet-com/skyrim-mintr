@@ -15,12 +15,20 @@
       <div class="row">
         <div class="col">
           <p class="burn-input-tix">Confirm or enter amount to burn:</p>
-          <input type="text" placeholder="0.00" class="burn-input">
+          <input type="text" v-model="burnAmount" placeholder="0.00" class="burn-input">
         </div>
       </div>
       <div class="row">
+        <div class="col-6 text-left notes-txt">
+          Unlock: {{willUnlock}} SNX
+        </div>
+        <!--        <div class="col-6 text-right notes-txt">-->
+        <!--          Estimated C-Ratio: NaN%-->
+        <!--        </div>-->
+      </div>
+      <div class="row">
         <div class="col">
-          <p class="eth-fees-txt">Ethereum network fees: $0 / 63 GWEI</p>
+          <p class="eth-fees-txt">&nbsp;</p>
         </div>
       </div>
       <div class="row">
@@ -41,10 +49,27 @@ import {syntheticAddr} from "../../utils/skyrim/constant";
 let opt = skyrim.opt
 export default {
   name: "Burn",
+  props: ["hideBurn"],
+
+  data(){
+    return {
+      burnAmount: "0",
+      willUnlock: "0",
+    }
+  },
+
+  watch: {
+    burnAmount() {
+      opt.synToSNS(syntheticAddr, this.burnAmount)
+      .then(r=>{
+        this.willUnlock = r
+      })
+    }
+  },
+
   methods: {
-    async burn(snsAmount) {
-      //todo: get unlock amount by user input
-      snsAmount = 5
+    async burn() {
+      let snsAmount = await opt.synToSNS(syntheticAddr, this.burnAmount)
 
       let validUnlock = await opt.validUnlock(syntheticAddr, snsAmount)
       if(!validUnlock) {
@@ -57,6 +82,10 @@ export default {
         console.log("mint transaction send success, tx hash is: ", unlockResult)
       } else {
         //user cancel or other unknown things happened, do nothing
+      }
+
+      if(typeof this.hideBurn === "function") {
+        this.hideBurn()
       }
     }
   },

@@ -47,9 +47,9 @@
       </div>
     </div>
 
-    <mint v-show="!mintDisabled"></mint>
+    <mint v-show="!mintDisabled" :hide-mint="cancel"></mint>
 
-    <burn v-show="!burnDisabled"></burn>
+    <burn v-show="!burnDisabled" :hide-burn="cancel"></burn>
 
     <a-modal
         title=""

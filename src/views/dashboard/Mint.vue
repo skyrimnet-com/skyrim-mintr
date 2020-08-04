@@ -15,26 +15,29 @@
       <div class="row">
         <div class="col">
           <p class="mint-input-tit">Confirm or enter amount to mint:</p>
-          <input type="text" placeholder="0.00" class="mint-input">
+          <input type="text" v-model="synAmount" placeholder="0.00" class="mint-input">
         </div>
       </div>
       <div class="row">
         <div class="col-6 text-left notes-txt">
-          Staking: 0 SNX
+          Staking: {{willLock}} SNX
         </div>
-        <div class="col-6 text-right notes-txt">
-          Estimated C-Ratio: NaN%
+<!--        <div class="col-6 text-right notes-txt">-->
+<!--          Estimated C-Ratio: NaN%-->
+<!--        </div>-->
+      </div>
+      <div class="row">
+        <div class="col">
+          <p class="eth-fees-txt">&nbsp;</p>
         </div>
       </div>
       <div class="row">
         <div class="col">
-          <p class="eth-fees-txt">Ethereum network fees: $0 / 63 GWEI</p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <input type="submit" class="btn btn-info btn-mint-now" value="Mint Now"
+          <input v-show="enabled" type="submit" class="btn btn-info btn-mint-now" value="Mint Now"
                  @click="mint"
+          >
+          <input v-show="!enabled" type="submit" class="btn btn-info btn-mint-now" value="Enable Mint"
+                 @click="enableMint"
           >
         </div>
       </div>
@@ -49,35 +52,75 @@ import {syntheticAddr} from "../../utils/skyrim/constant";
 let opt = skyrim.opt
 export default {
   name: "mint",
+  props: ["hideMint"],
+  data() {
+    return {
+      synAmount: "0",
+      enabled: false,
+      willLock: "0",
+    }
+  },
+
+  watch: {
+    enabled() {
+      if(this.enabled) {
+        $(this.$el).find(".mint-input").removeAttr("disabled")
+      } else {
+        $(this.$el).find(".mint-input").attr("disabled", "disabled")
+      }
+    },
+
+    synAmount() {
+      opt.synToSNS(syntheticAddr, this.synAmount)
+        .then(r=>{
+          this.willLock = r
+        })
+    }
+  },
+
+  mounted() {
+    opt.syntheticEnabled(syntheticAddr)
+    .then(r=>{
+      if(r) {
+        this.enabled = true
+      }
+    })
+    .catch(e=>{})
+  },
+
   methods: {
-    async mint(synAmount) {
+    async enableMint() {
       let enabled = await opt.syntheticEnabled(syntheticAddr)
-      if(!enabled) {
-        //todo: go to enable page
-        //todo: this i enable method
-        let enableReq = await opt.enableSynthetic(syntheticAddr)
-        if(enableReq) {
-          console.log("send enable synthetic assets tx success: ", enableReq)
-        } else {
-          //user cancel or other unknown things happened, do nothing
-        }
+      if(enabled) {
+        this.enabled = true
         return
       }
 
-      //todo: get amount by user input
-      synAmount = 10
+      opt.enableSynthetic(syntheticAddr)
+    },
 
-      let validMint = await opt.hasEnoughToLock(syntheticAddr, synAmount)
+    async mint() {
+      let enabled = await opt.syntheticEnabled(syntheticAddr)
+      if(!enabled) {
+        this.enabled = false
+        return
+      }
+
+      let validMint = await opt.hasEnoughToLock(syntheticAddr, this.synAmount)
       if(!validMint) {
         //todo: tell user dos not has enough SNS to lock
         return
       }
 
-      let mintResult = await opt.mint(syntheticAddr, synAmount)
+      let mintResult = await opt.mint(syntheticAddr, this.synAmount)
       if(mintResult !== null){
         console.log("mint transaction send success, tx hash is: ", mintResult)
       } else {
         //user cancel or other unknown things happened, do nothing
+      }
+
+      if(typeof this.hideMint === "function") {
+        this.hideMint()
       }
     },
   },

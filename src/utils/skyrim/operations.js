@@ -11,6 +11,8 @@ let syntheticAssetsList = {}
 
 let snsDecimals = new Decimal(10).pow(SNSContract.decimals)
 
+let lastMintingRate = 0
+
 function loadSNS() {
   if(snsToken === null) {
     let web3Instance = ETHWallet.getWeb3Instance()
@@ -130,7 +132,8 @@ async function currentMintingRate(assetAddress, outDecimal = false) {
     [])
     .then(r=>{
       let ret = new Decimal(r).div(1e6)
-      return outDecimal ? ret:ret.toDP(6, Decimal.ROUND_DOWN)
+      lastMintingRate = ret.toDP(6, Decimal.ROUND_DOWN)
+      return outDecimal ? ret:lastMintingRate
     })
 
 }
@@ -242,22 +245,30 @@ async function syntheticEnabled(synAddr) {
   }
 }
 
-async function snsToSyn(synAddr, snsAmount) {
+async function snsToSyn(synAddr, snsAmount, fast = true) {
+  if(fast && lastMintingRate !== 0) {
+    return new Decimal(snsAmount).div(lastMintingRate).toDP(6, Decimal.ROUND_DOWN).toString()
+  }
+
   let mintingRate = await currentMintingRate(synAddr)
   if(!mintingRate) {
     return "0"
   }
 
-  return new Decimal(snsAmount).div(mintingRate).toDP(6, Decimal.ROUND_DOWN)
+  return new Decimal(snsAmount).div(mintingRate).toDP(6, Decimal.ROUND_DOWN).toString()
 }
 
-async function synToSNS(synAddr, synAmount) {
+async function synToSNS(synAddr, synAmount, fast = true) {
+  if(fast && lastMintingRate !== 0) {
+    return new Decimal(synAmount).mul(lastMintingRate).toDP(6, Decimal.ROUND_DOWN).toString()
+  }
+
   let mintingRate = await currentMintingRate(synAddr)
   if(!mintingRate) {
     return "0"
   }
 
-  return new Decimal(synAmount).mul(mintingRate).toDP(6, Decimal.ROUND_DOWN)
+  return new Decimal(synAmount).mul(mintingRate).toDP(6, Decimal.ROUND_DOWN).toString()
 }
 
 export default {
