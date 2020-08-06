@@ -3,49 +3,49 @@
     class="navbar navbar-expand-md navbar-dark container"
   >
     <router-link class="navbar-brand" :to="{ path: '/' }">
-      <img class="navbar-logo" :src="'/static/logo/top-nav-logo.png'" alt="SNS"/>
+      <img class="navbar-logo" :src="'/static/logo/top-nav-logo.png'" alt=""/>
     </router-link>
 
     <!-- Toggler/collapsibe Button -->
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#snsNavbar">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavbar">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <!-- Navbar links -->
-    <div class="collapse navbar-collapse"  id="snsNavbar">
+    <div class="collapse navbar-collapse"  id="myNavbar">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
           <a
             class="scroll-bottom"
-            href="https://t.me/Skyrimprotocol" target="_blank"
+            :href="$t('links.telegram')" target="_blank"
           >{{ $t("common.telegram") }}</a
           >
         </li>
         <li class="nav-item">
           <a
             class="scroll-bottom"
-            href="https://open.kakao.com/o/geb7pRmb" target="_blank"
-          >{{ $t("common.kakaotalk") }}</a
+            :href="$t('links.kakaoTalk')" target="_blank"
+          >{{ $t("common.kakaoTalk") }}</a
           >
         </li>
         <li class="nav-item">
           <a
             class="scroll-bottom"
-            href="https://twitter.com/skyrimnet" target="_blank"
+            :href="$t('links.twitter')" target="_blank"
           >{{ $t("common.twitter") }}</a
           >
         </li>
         <li class="nav-item">
           <a
             class="scroll-bottom"
-            href="https://medium.com/@skyrimnetworkSNS" target="_blank"
+            :href="$t('links.medium')" target="_blank"
           >{{ $t("common.medium") }}</a
           >
         </li>
         <li class="nav-item">
           <a
             class="scroll-bottom"
-            href="https://uniswap.info/token/0x8e3c8e2de3cced6250b4ec129a82af4d2d3cbc5f" target="_blank"
+            :href="$t('links.uniswap')" target="_blank"
           >{{ $t("common.uniswap") }}</a
           >
         </li>

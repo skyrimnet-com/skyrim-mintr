@@ -11,15 +11,15 @@
         <div class="wallet-connect-div">
           <div class="row">
             <div class="col text-center wallet-connect-tit">
-              Please connect a wallet with your SNS holdings to start:
+              {{ $t("wallet.connect") }}
             </div>
           </div>
 
           <div class="row">
             <div class="col d-flex justify-content-around">
               <button type="submit" class="wallet-btn" @click="openMetamask">
-                <img class="wallet-btn-icon text-right" :src="'/static/wallet-btn/metamask.svg'" alt="Metamask"/>
-                <h2 class="wallet-btn-name text-left">Metamask</h2>
+                <img class="wallet-btn-icon text-right" :src="'/static/wallet-btn/metamask.svg'" :alt="$t('wallet.metamask')"/>
+                <h2 class="wallet-btn-name text-left">{{ $t("wallet.metamask") }}</h2>
               </button>
             </div>
           </div>
@@ -27,8 +27,8 @@
 <!--          <div class="row">-->
 <!--            <div class="col d-flex justify-content-around">-->
 <!--              <button type="submit" class="wallet-btn" @click="openWalletConnect">-->
-<!--                <img class="wallet-btn-icon" :src="'/static/wallet-btn/walletconnect.svg'" alt="WalletConnect"/>-->
-<!--                <h2 class="wallet-btn-name">WalletConnect</h2>-->
+<!--                <img class="wallet-btn-icon" :src="'/static/wallet-btn/walletconnect.svg'" :alt="$t('wallet.walletConnect')"/>-->
+<!--                <h2 class="wallet-btn-name">{{ $t("wallet.walletConnect") }}</h2>-->
 <!--              </button>-->
 <!--            </div>-->
 <!--          </div>-->

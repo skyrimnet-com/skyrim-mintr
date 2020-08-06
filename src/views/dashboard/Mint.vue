@@ -3,28 +3,25 @@
     <div class="col">
       <div class="row">
         <div class="col">
-          <img class="mint-logo" :src="'/static/like-to-do/mint.svg'" alt="SNS"/>
+          <img class="mint-logo" :src="'/static/like-to-do/mint.svg'" :alt="$t('token.name')"/>
         </div>
       </div>
       <div class="row">
         <div class="col">
-          <p class="mint-tit">MINT</p>
-          <p class="mint-txt">Mint sETH by staking your SNS. This gives you a Collateralization Ratio and a debt, allowing you to earn staking rewards.</p>
+          <p class="mint-tit">{{ $t("action.mint") }}</p>
+          <p class="mint-txt">{{ $t("dashboard.mint.txt") }}}</p>
         </div>
       </div>
       <div class="row">
         <div class="col">
-          <p class="mint-input-tit">Confirm or enter amount to mint:</p>
+          <p class="mint-input-tit">{{ $t("dashboard.mint.confirm") }}</p>
           <input type="text" v-model="synAmount" placeholder="0.00" class="mint-input">
         </div>
       </div>
       <div class="row">
         <div class="col-12 text-left notes-txt">
-          Staking: {{willLock}} SNX
+          {{ $t("dashboard.mint.staking") }} {{willLock}} {{ $t("token.name") }}
         </div>
-<!--        <div class="col-6 text-right notes-txt">-->
-<!--          Estimated C-Ratio: NaN%-->
-<!--        </div>-->
       </div>
       <div class="row">
         <div class="col">
@@ -85,7 +82,7 @@ export default {
     },
 
     synAmount() {
-      opt.synToSNS(syntheticAddr, this.synAmount)
+      opt.synToToken(syntheticAddr, this.synAmount)
         .then(r=>{
           this.willLock = r
         })
@@ -133,7 +130,7 @@ export default {
         setTimeout(_=>{
           this.$notification.open({
             message: 'Invalid Mint!',
-            description: "SNS insufficient",
+            description: this.$i18n.t("token.name") + " insufficient",
             duration: 0,
           });
           this.loading = false

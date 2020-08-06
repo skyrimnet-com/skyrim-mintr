@@ -1,22 +1,22 @@
 import ETHWallet from "./ethWallet";
-import SNSContract from "./snsToken"
+import MYContract from "./snsToken"
 import SyntheticAssets from "./snsSyntheticAssets"
 import Decimal from "decimal.js"
 
 import {onChainCall, offChainCall} from "./common";
 import {syntheticAddr} from "./constant";
 
-let snsToken = null
+let myToken = null
 let syntheticAssetsList = {}
 
-let snsDecimals = new Decimal(10).pow(SNSContract.decimals)
+let tokenDecimals = new Decimal(10).pow(MYContract.decimals)
 
 let lastMintingRate = 0
 
-function loadSNS() {
-  if(snsToken === null) {
+function loadTOKEN() {
+  if(myToken === null) {
     let web3Instance = ETHWallet.getWeb3Instance()
-    snsToken = new web3Instance.eth.Contract(SNSContract.abi, SNSContract.getAddress())
+    myToken = new web3Instance.eth.Contract(MYContract.abi, MYContract.getAddress())
   }
 }
 
@@ -39,7 +39,7 @@ function getSynAssets(address) {
 
 async function commonApprove(synAssetsAddress, amount) {
   return await onChainCall(
-    snsToken,
+    myToken,
     ETHWallet.getAccount(),
     "approve",
     [synAssetsAddress, amount],
@@ -51,8 +51,8 @@ async function disableSynthetic(synAssetsAddress, amount) {
     return
   }
 
-  if(!snsToken) {
-    loadSNS()
+  if(!myToken) {
+    loadTOKEN()
   }
 
   return commonApprove(synAssetsAddress, "0")
@@ -63,8 +63,8 @@ async function enableSynthetic(synAssetsAddress) {
     return
   }
 
-  if(!snsToken) {
-    loadSNS()
+  if(!myToken) {
+    loadTOKEN()
   }
 
   Decimal.set({ toExpPos: 256 })
@@ -75,23 +75,23 @@ async function enableSynthetic(synAssetsAddress) {
 async function commonERC20Balance(contract, address, outDecimal) {
   let result = await offChainCall(contract, address, "balanceOf", [address])
   if(result !== null) {
-    result = new Decimal(result).div(snsDecimals)
+    result = new Decimal(result).div(tokenDecimals)
     return outDecimal ? result:result.toDP(6, Decimal.ROUND_DOWN)
   } else {
     return null
   }
 }
 
-async function snsBalance(outDecimal = false) {
+async function tokenBalance(outDecimal = false) {
   if(!ETHWallet.isConnected()) {
     return null
   }
 
-  if(!snsToken) {
-    loadSNS()
+  if(!myToken) {
+    loadTOKEN()
   }
 
-  return  await commonERC20Balance(snsToken, ETHWallet.getAccount(), outDecimal)
+  return  await commonERC20Balance(myToken, ETHWallet.getAccount(), outDecimal)
 }
 
 async function synAssetsBalance(synAddress, outDecimal = false) {
@@ -103,7 +103,7 @@ async function synAssetsBalance(synAddress, outDecimal = false) {
   return  await commonERC20Balance(synAssets, ETHWallet.getAccount(), outDecimal)
 }
 
-async function lockedSNSFor(synAddress, outDecimal = false) {
+async function lockedTOKENFor(synAddress, outDecimal = false) {
   let synAssets = getSynAssets(synAddress)
   if(!synAssets) {
     return
@@ -112,7 +112,7 @@ async function lockedSNSFor(synAddress, outDecimal = false) {
   let address = ETHWallet.getAccount()
   let result = await offChainCall(synAssets, address, "lockedSNS", [address])
   if(result !== null) {
-    result = new Decimal(result).div(snsDecimals)
+    result = new Decimal(result).div(tokenDecimals)
 
     return outDecimal ? result:result.toDP(6, Decimal.ROUND_DOWN)
   }
@@ -144,7 +144,7 @@ async function mint(assetAddress, synAmount) {
   }
 
   let synAssets = getSynAssets(assetAddress)
-  let outAmount = new Decimal(synAmount).mul(snsDecimals)
+  let outAmount = new Decimal(synAmount).mul(tokenDecimals)
 
   Decimal.set({ toExpPos: 256 })
 
@@ -162,20 +162,20 @@ async function mint(assetAddress, synAmount) {
   return ret
 }
 
-async function redeem(synAddress, snsAmount) {
+async function redeem(synAddress, tokenAmount) {
   if(!ETHWallet.isConnected()) {
     return null
   }
 
   let synAssets = getSynAssets(synAddress)
   Decimal.set({ toExpPos: 256 })
-  snsAmount = new Decimal(snsAmount).mul(snsDecimals)
+  tokenAmount = new Decimal(tokenAmount).mul(tokenDecimals)
 
   return await onChainCall(
     synAssets,
     ETHWallet.getAccount(),
     "redeem",
-    [snsAmount.toString()],
+    [tokenAmount.toString()],
   )
 }
 
@@ -190,18 +190,18 @@ async function ethBalance() {
     })
 }
 
-async function load(snsAddress) {
-  SNSContract.setTokenAddress(snsAddress)
+async function load(tokenAddress) {
+  MYContract.setTokenAddress(tokenAddress)
   return ETHWallet.loadWallet()
 }
 
-async function verifyUnlock(synAddr, unlockSNS) {
-  let lockedAmount = await lockedSNSFor(syntheticAddr, true)
+async function verifyUnlock(synAddr, unlockTOKEN) {
+  let lockedAmount = await lockedTOKENFor(syntheticAddr, true)
   if(lockedAmount === null) {
     return "Can't get locked SNS amount."
   }
 
-  if(!lockedAmount.gte(unlockSNS)) {
+  if(!lockedAmount.gte(unlockTOKEN)) {
     return "SNS unlocked amount exceeds the locked."
   }
 
@@ -215,7 +215,7 @@ async function verifyUnlock(synAddr, unlockSNS) {
     return "Can't get current burn ratio."
   }
 
-  let amountToBurn = new Decimal(unlockSNS).div(mintingRate)
+  let amountToBurn = new Decimal(unlockTOKEN).div(mintingRate)
   if(!synBalance.gte(amountToBurn)) {
     return "sETH insufficient"
 
@@ -225,8 +225,8 @@ async function verifyUnlock(synAddr, unlockSNS) {
 }
 
 async function hasEnoughToLock(synAddr, targetAmount) {
-  let sns = await snsBalance(true)
-  if(!sns) {
+  let token = await tokenBalance(true)
+  if(!token) {
     return false
   }
 
@@ -236,28 +236,28 @@ async function hasEnoughToLock(synAddr, targetAmount) {
   }
 
   let amountToLock = new Decimal(targetAmount).mul(mintingRate)
-  return sns.gte(amountToLock)
+  return token.gte(amountToLock)
 }
 
 async function syntheticEnabled(synAddr) {
-  if(!snsToken) {
-    loadSNS()
+  if(!myToken) {
+    loadTOKEN()
   }
 
   let address = ETHWallet.getAccount()
-  let result = await offChainCall(snsToken, address, "allowance", [address, synAddr])
+  let result = await offChainCall(myToken, address, "allowance", [address, synAddr])
 
   if(result !== null) {
-    let amount = new Decimal(result).div(snsDecimals)
+    let amount = new Decimal(result).div(tokenDecimals)
     return amount.gt(0)
   } else {
     return false
   }
 }
 
-async function snsToSyn(synAddr, snsAmount, fast = true) {
+async function tokenToSyn(synAddr, tokenAmount, fast = true) {
   if(fast && lastMintingRate !== 0) {
-    return new Decimal(snsAmount).div(lastMintingRate).toDP(6, Decimal.ROUND_DOWN).toString()
+    return new Decimal(tokenAmount).div(lastMintingRate).toDP(6, Decimal.ROUND_DOWN).toString()
   }
 
   let mintingRate = await currentMintingRate(synAddr)
@@ -265,10 +265,10 @@ async function snsToSyn(synAddr, snsAmount, fast = true) {
     return "0"
   }
 
-  return new Decimal(snsAmount).div(mintingRate).toDP(6, Decimal.ROUND_DOWN).toString()
+  return new Decimal(tokenAmount).div(mintingRate).toDP(6, Decimal.ROUND_DOWN).toString()
 }
 
-async function synToSNS(synAddr, synAmount, fast = true) {
+async function synToToken(synAddr, synAmount, fast = true) {
   if(fast && lastMintingRate !== 0) {
     return new Decimal(synAmount).mul(lastMintingRate).toDP(6, Decimal.ROUND_DOWN).toString()
   }
@@ -285,10 +285,10 @@ export default {
   load,
 
   ethBalance,
-  snsBalance,
+  tokenBalance,
   synAssetsBalance,
   currentMintingRate,
-  lockedSNSFor,
+  lockedTOKENFor,
 
   enableSynthetic,
   syntheticEnabled,
@@ -300,6 +300,6 @@ export default {
   verifyUnlock,
   hasEnoughToLock,
 
-  snsToSyn,
-  synToSNS,
+  tokenToSyn,
+  synToToken,
 }

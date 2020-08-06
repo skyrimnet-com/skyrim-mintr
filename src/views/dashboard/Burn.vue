@@ -3,24 +3,24 @@
     <div class="col">
       <div class="row">
         <div class="col">
-          <img class="burn-logo" :src="'/static/like-to-do/burn.svg'" alt="SNS"/>
+          <img class="burn-logo" :src="'/static/like-to-do/burn.svg'" :alt="$t('token.name')"/>
         </div>
       </div>
       <div class="row">
         <div class="col">
-          <p class="burn-tit">BURN</p>
-          <p class="burn-txt">Burn sETH to unlock your staked SNS. This increases your Collateralization Ratio and reduces your debt, allowing you to transfer your non-escrowed SNS.</p>
+          <p class="burn-tit">{{ $t("action.burn") }}</p>
+          <p class="burn-txt">{{ $t("dashboard.burn.txt") }}</p>
         </div>
       </div>
       <div class="row">
         <div class="col">
-          <p class="burn-input-tix">Confirm or enter amount to burn:</p>
+          <p class="burn-input-tix">{{ $t("dashboard.burn.confirm") }}</p>
           <input type="text" v-model="burnAmount" placeholder="0.00" class="burn-input">
         </div>
       </div>
       <div class="row">
         <div class="col-12 text-left notes-txt">
-          Unlock: {{willUnlock}} SNX
+          {{ $t("dashboard.burn.unlock") }} {{willUnlock}} {{ $t("token.name") }}
         </div>
         <!--        <div class="col-6 text-right notes-txt">-->
         <!--          Estimated C-Ratio: NaN%-->
@@ -73,7 +73,7 @@ export default {
 
   watch: {
     burnAmount() {
-      opt.synToSNS(syntheticAddr, this.burnAmount)
+      opt.synToToken(syntheticAddr, this.burnAmount)
       .then(r=>{
         this.willUnlock = r
       })
@@ -82,10 +82,10 @@ export default {
 
   methods: {
     async burn() {
-      let snsAmount = await opt.synToSNS(syntheticAddr, this.burnAmount)
+      let tokenAmount = await opt.synToToken(syntheticAddr, this.burnAmount)
 
       this.loading = true
-      let validUnlock = await opt.verifyUnlock(syntheticAddr, snsAmount)
+      let validUnlock = await opt.verifyUnlock(syntheticAddr, tokenAmount)
       if(true !== validUnlock) {
         this.loading = false
         this.$notification.open({
@@ -96,7 +96,7 @@ export default {
         return
       }
 
-      let unlockResult = await opt.redeem(syntheticAddr, snsAmount)
+      let unlockResult = await opt.redeem(syntheticAddr, tokenAmount)
       if(unlockResult !== null){
         console.log("mint transaction send success, tx hash is: ", unlockResult)
       } else {

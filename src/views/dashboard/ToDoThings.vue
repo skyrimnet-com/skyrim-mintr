@@ -2,40 +2,40 @@
   <div class="wallet-div">
 
     <div class="row">
-      <div class="col wallet-detail-tit">What would you like to do?</div>
+      <div class="col wallet-detail-tit">{{ $t("dashboard.toDoThings.toDoName") }}</div>
     </div>
 
     <div class="row text-center" v-show="!toDoThingsViewDisabled">
       <div class="col like-to-do-div" @click="viewMint">
         <div>
-          <img class="like-to-do-logo" :src="'/static/like-to-do/mint.svg'" alt="SNS"/>
+          <img class="like-to-do-logo" :src="'/static/like-to-do/mint.svg'" :alt="$t('token.name')"/>
         </div>
-        <div class="like-to-do-tit">MINT</div>
-        <div class="like-to-do-txt">Mint sETH by staking SNS</div>
+        <div class="like-to-do-tit">{{ $t("action.mint") }}</div>
+        <div class="like-to-do-txt">{{ $t("dashboard.toDoThings.mint") }}</div>
       </div>
       <div class="col like-to-do-div" @click="viewBurn">
         <div>
-          <img class="like-to-do-logo" :src="'/static/like-to-do/burn.svg'" alt="SNS"/>
+          <img class="like-to-do-logo" :src="'/static/like-to-do/burn.svg'" :alt="$t('token.name')"/>
         </div>
-        <div class="like-to-do-tit">BURN</div>
-        <div class="like-to-do-txt">Burn sETH to unlock staked SNS</div>
+        <div class="like-to-do-tit">{{ $t("action.burn") }}</div>
+        <div class="like-to-do-txt">{{ $t("dashboard.toDoThings.burn") }}</div>
       </div>
     </div>
 
     <div class="row text-center" v-show="!toDoThingsViewDisabled">
       <div class="col like-to-do-div" @click="comingSoon">
         <div>
-          <img class="like-to-do-logo" :src="'/static/like-to-do/transfer.svg'" alt="SNS"/>
+          <img class="like-to-do-logo" :src="'/static/like-to-do/transfer.svg'" :alt="$t('token.name')"/>
         </div>
-        <div class="like-to-do-tit">TRANSFER</div>
-        <div class="like-to-do-txt">Transfer SNS, Synths, or ETH</div>
+        <div class="like-to-do-tit">{{ $t("action.transfer") }}</div>
+        <div class="like-to-do-txt">{{ $t("dashboard.toDoThings.transfer") }}</div>
       </div>
       <div class="col like-to-do-div" @click="comingSoon">
         <div>
-          <img class="like-to-do-logo" :src="'/static/like-to-do/track.svg'" alt="SNS"/>
+          <img class="like-to-do-logo" :src="'/static/like-to-do/track.svg'" :alt="$t('token.name')"/>
         </div>
-        <div class="like-to-do-tit">TRACK</div>
-        <div class="like-to-do-txt">Track your debt over time</div>
+        <div class="like-to-do-tit">{{ $t("action.track") }}</div>
+        <div class="like-to-do-txt">{{ $t("dashboard.toDoThings.track") }}</div>
       </div>
     </div>
 

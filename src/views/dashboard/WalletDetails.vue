@@ -2,7 +2,7 @@
   <div class="wallet-div">
 
     <div class="row">
-      <div class="col text-left wallet-detail-tit">YOUR WALLET DETAILS:</div>
+      <div class="col text-left wallet-detail-tit">{{ $t("dashboard.wallet.details") }}</div>
       <div class="col">
 <!--        <input type="submit" class="btn btn-info btn-refresh" value="Refresh">-->
       </div>
@@ -14,35 +14,24 @@
           <div class="col text-center txt-ratio-tit">{{mintingRate * 100}} %</div>
         </div>
         <div class="row">
-          <div class="col text-center txt-ratio-txt">Target collateralization ratio</div>
+          <div class="col text-center txt-ratio-txt">{{ $t("dashboard.wallet.ratio") }}</div>
         </div>
       </div>
     </div>
 
-<!--    <div class="row fee-div">-->
-<!--      <div class="col">-->
-<!--        <img class="token-logo" :src="'/static/logo/sns-icon.png'" alt="SNS"/>-->
-<!--        <span class="token-price">1 SNS = $0.05 USD</span>-->
-<!--      </div>-->
-<!--      <div class="col">-->
-<!--        <img class="token-logo" :src="'/static/token/ETH.svg'" alt="ETH"/>-->
-<!--        <span class="token-price">1 ETH = $356.42 USD</span>-->
-<!--      </div>-->
-<!--    </div>-->
-
     <div class="row total-token-div">
       <div class="col">
         <div class="row">
-          <div class="col text-left token-price">TOTAL SNS:</div>
-          <div class="col text-right token-price">{{totalSNS}} SNS</div>
+          <div class="col text-left token-price">{{ $t("dashboard.wallet.total") }} {{ $t("token.name") }}:</div>
+          <div class="col text-right token-price">{{totalTOKEN}} {{ $t("token.name") }}</div>
         </div>
         <hr class="total-hr">
         <div class="row">
           <div class="col text-left lock-tran-txt">
-            Locked: {{lockedSNS}}
+            {{ $t("dashboard.wallet.locked") }} {{lockedTOKEN}}
           </div>
           <div class="col text-right lock-tran-txt">
-            Transferable: {{snsBalance}}
+            {{ $t("dashboard.wallet.transfer") }} {{tokenBalance}}
           </div>
         </div>
         <div class="row">
@@ -55,39 +44,35 @@
     <div class="row balance-list-div">
       <div class="col">
         <div class="row">
-          <div class="col text-center token-price">BALANCE LIST</div>
+          <div class="col text-center token-price">{{ $t("dashboard.wallet.balanceList") }}</div>
         </div>
         <div class="row balance-item-1">
           <div class="col">
-            <img class="balance-logo" :src="'/static/logo/sns-icon.png'" alt="SNS"/>
-            SNS
+            <img class="balance-logo" :src="'/static/logo/sns-icon.png'" alt=""/>
+            {{ $t("token.name") }}
           </div>
-          <div class="col text-right">{{snsBalance}}</div>
-<!--          <div class="col text-right">0 USD</div>-->
+          <div class="col text-right">{{tokenBalance}}</div>
         </div>
         <div class="row balance-item-2">
           <div class="col">
-            <img class="balance-logo" :src="'/static/token/ETH.svg'" alt="ETH"/>
-            ETH
+            <img class="balance-logo" :src="'/static/token/ETH.svg'" alt=""/>
+            {{ $t("token.eth") }}
           </div>
           <div class="col text-right">{{ethBalance}}</div>
-<!--          <div class="col text-right">0 USD</div>-->
         </div>
         <div class="row balance-item-1">
           <div class="col">
-            <img class="balance-logo" :src="'/static/logo/sns-icon.png'" alt="SNS"/>
-            sETH
+            <img class="balance-logo" :src="'/static/logo/sns-icon.png'" alt=""/>
+            {{ $t("token.synthAsset") }}
           </div>
           <div class="col text-right">{{synBalance}}</div>
-<!--          <div class="col text-right">0 USD</div>-->
         </div>
         <div class="row balance-item-2">
           <div class="col">
-            <img class="balance-logo" :src="'/static/logo/sns-icon.png'" alt="SNS"/>
-            Locked SNS
+            <img class="balance-logo" :src="'/static/logo/sns-icon.png'" alt=""/>
+            {{ $t("token.lockedToken") }}
           </div>
-          <div class="col text-right">{{lockedSNS}}</div>
-<!--          <div class="col text-right">0 USD</div>-->
+          <div class="col text-right">{{lockedTOKEN}}</div>
         </div>
       </div>
     </div>
@@ -97,7 +82,7 @@
         <a
           class="go-to-uniswap-txt"
           href="https://app.uniswap.org/#/swap?inputCurrency=0x8e3c8e2de3cced6250b4ec129a82af4d2d3cbc5f" target="_blank"
-        >GO TO UNISWAP</a
+        >{{ $t("dashboard.wallet.uniswap") }}</a
         >
       </div>
     </div>
@@ -145,11 +130,11 @@
 
         querying = true
 
-        this.snsBalance = await commonBalance(opt.snsBalance)
+        this.tokenBalance = await commonBalance(opt.tokenBalance)
         this.ethBalance = await commonBalance(opt.ethBalance)
         this.mintingRate = await commonBalance(opt.currentMintingRate, syntheticAddr)
         this.synBalance = await commonBalance(opt.synAssetsBalance, syntheticAddr)
-        this.lockedSNS = await commonBalance(opt.lockedSNSFor, syntheticAddr)
+        this.lockedTOKEN = await commonBalance(opt.lockedTOKENFor, syntheticAddr)
 
         this.loading = false
         querying = false
@@ -159,17 +144,17 @@
     data() {
       return {
         mintingRate: "0",
-        snsBalance: "0",
+        tokenBalance: "0",
         ethBalance: "0",
         synBalance: "0",
-        lockedSNS: "0",
+        lockedTOKEN: "0",
         loading: true,
       }
     },
 
     computed: {
-      totalSNS() {
-        return new Decimal(this.snsBalance).add(this.lockedSNS).toDP(6, Decimal.ROUND_DOWN)
+      totalTOKEN() {
+        return new Decimal(this.tokenBalance).add(this.lockedTOKEN).toDP(6, Decimal.ROUND_DOWN)
       }
     },
 

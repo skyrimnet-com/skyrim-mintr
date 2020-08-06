@@ -224,8 +224,8 @@ let abi = [
 let address = ""
 let decimals = 18
 
-function setTokenAddress(snsAddress) {
-  address = snsAddress
+function setTokenAddress(tokenAddress) {
+  address = tokenAddress
 }
 
 function getAddress() {

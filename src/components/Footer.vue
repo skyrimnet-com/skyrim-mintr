@@ -33,11 +33,5 @@
   .footer-col {
     margin: 24px 0;
   }
-
-  .sns-navbar-txt {
-    font-size:17px;
-    font-weight:300;
-    color:white;
-  }
 }
 </style>
