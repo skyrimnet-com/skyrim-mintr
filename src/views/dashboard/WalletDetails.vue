@@ -4,7 +4,7 @@
     <div class="row">
       <div class="col text-left wallet-detail-tit">YOUR WALLET DETAILS:</div>
       <div class="col">
-        <input type="submit" class="btn btn-info btn-refresh" value="Refresh">
+<!--        <input type="submit" class="btn btn-info btn-refresh" value="Refresh">-->
       </div>
     </div>
 
@@ -19,16 +19,16 @@
       </div>
     </div>
 
-    <div class="row fee-div">
-      <div class="col">
-        <img class="token-logo" :src="'/static/logo/sns-icon.png'" alt="SNS"/>
-        <span class="token-price">1 SNS = $0.05 USD</span>
-      </div>
-      <div class="col">
-        <img class="token-logo" :src="'/static/token/ETH.svg'" alt="ETH"/>
-        <span class="token-price">1 ETH = $356.42 USD</span>
-      </div>
-    </div>
+<!--    <div class="row fee-div">-->
+<!--      <div class="col">-->
+<!--        <img class="token-logo" :src="'/static/logo/sns-icon.png'" alt="SNS"/>-->
+<!--        <span class="token-price">1 SNS = $0.05 USD</span>-->
+<!--      </div>-->
+<!--      <div class="col">-->
+<!--        <img class="token-logo" :src="'/static/token/ETH.svg'" alt="ETH"/>-->
+<!--        <span class="token-price">1 ETH = $356.42 USD</span>-->
+<!--      </div>-->
+<!--    </div>-->
 
     <div class="row total-token-div">
       <div class="col">
@@ -76,7 +76,7 @@
         <div class="row balance-item-1">
           <div class="col">
             <img class="balance-logo" :src="'/static/logo/sns-icon.png'" alt="SNS"/>
-            Synths
+            sETH
           </div>
           <div class="col text-right">{{synBalance}}</div>
 <!--          <div class="col text-right">0 USD</div>-->
@@ -84,7 +84,7 @@
         <div class="row balance-item-2">
           <div class="col">
             <img class="balance-logo" :src="'/static/logo/sns-icon.png'" alt="SNS"/>
-            Debt
+            Locked SNS
           </div>
           <div class="col text-right">{{lockedSNS}}</div>
 <!--          <div class="col text-right">0 USD</div>-->
@@ -102,6 +102,9 @@
       </div>
     </div>
 
+    <loading :active.sync="loading"
+             :can-cancel="false"
+             :is-full-page="true"></loading>
   </div>
 </template>
 
@@ -109,6 +112,10 @@
   import skyrim from "../../utils/skyrim/skyrim";
   import {syntheticAddr} from "../../utils/skyrim/constant";
   import Decimal from "decimal.js"
+  // Import component
+  import Loading from 'vue-loading-overlay';
+  // Import stylesheet
+  import 'vue-loading-overlay/dist/vue-loading.css';
 
   let opt = skyrim.opt
   let querying = false
@@ -126,6 +133,10 @@
   export default {
     name: "WalletDetails",
 
+    components: {
+      Loading
+    },
+
     mounted() {
       setInterval(async _=>{
         if(querying) {
@@ -140,6 +151,7 @@
         this.synBalance = await commonBalance(opt.synAssetsBalance, syntheticAddr)
         this.lockedSNS = await commonBalance(opt.lockedSNSFor, syntheticAddr)
 
+        this.loading = false
         querying = false
       }, 1000)
     },
@@ -151,6 +163,7 @@
         ethBalance: "0",
         synBalance: "0",
         lockedSNS: "0",
+        loading: true,
       }
     },
 

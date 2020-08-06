@@ -150,12 +150,16 @@ async function mint(assetAddress, synAmount) {
 
   outAmount =  outAmount.trunc().toString()
 
-  return await onChainCall(
+  let ret = await onChainCall(
     synAssets,
     ETHWallet.getAccount(),
     "mint",
     [outAmount],
-  )
+  ).catch(e=>{
+    return null
+  })
+
+  return ret
 }
 
 async function redeem(synAddress, snsAmount) {
@@ -191,28 +195,33 @@ async function load(snsAddress) {
   return ETHWallet.loadWallet()
 }
 
-async function validUnlock(synAddr, unlockSNS) {
+async function verifyUnlock(synAddr, unlockSNS) {
   let lockedAmount = await lockedSNSFor(syntheticAddr, true)
   if(lockedAmount === null) {
-    return false
+    return "Can't get locked SNS amount."
   }
 
   if(!lockedAmount.gte(unlockSNS)) {
-    return false
+    return "SNS unlocked amount exceeds the locked."
   }
 
   let synBalance = await synAssetsBalance(synAddr, true)
   if(!synBalance) {
-    return false
+    return "Can't get sETH balance."
   }
 
   let mintingRate = await currentMintingRate(synAddr, true)
   if(!mintingRate) {
-    return false
+    return "Can't get current burn ratio."
   }
 
   let amountToBurn = new Decimal(unlockSNS).div(mintingRate)
-  return synBalance.gte(amountToBurn);
+  if(!synBalance.gte(amountToBurn)) {
+    return "sETH insufficient"
+
+  }
+
+  return true
 }
 
 async function hasEnoughToLock(synAddr, targetAmount) {
@@ -237,6 +246,7 @@ async function syntheticEnabled(synAddr) {
 
   let address = ETHWallet.getAccount()
   let result = await offChainCall(snsToken, address, "allowance", [address, synAddr])
+
   if(result !== null) {
     let amount = new Decimal(result).div(snsDecimals)
     return amount.gt(0)
@@ -287,7 +297,7 @@ export default {
   mint,
   redeem,
 
-  validUnlock,
+  verifyUnlock,
   hasEnoughToLock,
 
   snsToSyn,

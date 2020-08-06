@@ -24,14 +24,14 @@
             </div>
           </div>
 
-          <div class="row">
-            <div class="col d-flex justify-content-around">
-              <button type="submit" class="wallet-btn" @click="openWalletConnect">
-                <img class="wallet-btn-icon" :src="'/static/wallet-btn/walletconnect.svg'" alt="WalletConnect"/>
-                <h2 class="wallet-btn-name">WalletConnect</h2>
-              </button>
-            </div>
-          </div>
+<!--          <div class="row">-->
+<!--            <div class="col d-flex justify-content-around">-->
+<!--              <button type="submit" class="wallet-btn" @click="openWalletConnect">-->
+<!--                <img class="wallet-btn-icon" :src="'/static/wallet-btn/walletconnect.svg'" alt="WalletConnect"/>-->
+<!--                <h2 class="wallet-btn-name">WalletConnect</h2>-->
+<!--              </button>-->
+<!--            </div>-->
+<!--          </div>-->
         </div>
       </div>
     </div>

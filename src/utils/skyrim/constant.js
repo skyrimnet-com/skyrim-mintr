@@ -1,5 +1,5 @@
-let syntheticAddr = "0xC2F10050732C1A0a4c8615fdf47B77D229A04B51"
-let snsAddr = "0x8b3112F7Bf226231e841E3b57dE17cf88e8183BD"
+let syntheticAddr = "0xa143446553d3e6db8fe5e025ad509da25012c5ef"
+let snsAddr = "0x8e3c8e2de3cced6250b4ec129a82af4d2d3cbc5f"
 
 export {
   snsAddr,

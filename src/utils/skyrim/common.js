@@ -1,8 +1,6 @@
 let transactionResultGetter = function (resolve, err, data) {
   let result = null
-  if(err) {
-    return null
-  } else {
+  if(!err) {
     result = data
   }
 
@@ -46,6 +44,9 @@ async function onChainCall(contract, from, methodName, param, amount, gasLimit, 
       .send(sendParam, (err, tx) =>  {
         transactionResultGetter(rs, err, tx)
       })
+      .catch(e=>{
+        transactionResultGetter(rs, e, null)
+      })
   })
 }
 
@@ -57,7 +58,7 @@ async function offChainCall(contract, from, methodName, param = []) {
     return null
   }
 
-  return await new Promise(resolve => {
+  return  await new Promise(resolve => {
     method.func(...param).call({from: from}, (err, result) => {
       transactionResultGetter(resolve, err, result)
     }).catch(reason => {

@@ -19,7 +19,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-6 text-left notes-txt">
+        <div class="col-12 text-left notes-txt">
           Staking: {{willLock}} SNX
         </div>
 <!--        <div class="col-6 text-right notes-txt">-->
@@ -42,22 +42,36 @@
         </div>
       </div>
     </div>
+
+    <loading :active.sync="loading"
+             :can-cancel="false"
+             :is-full-page="true"></loading>
   </div>
 </template>
 
 <script>
 import skyrim from "../../utils/skyrim/skyrim";
 import {syntheticAddr} from "../../utils/skyrim/constant";
+import $ from "jquery";
+
+// Import component
+import Loading from 'vue-loading-overlay';
+// Import stylesheet
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 let opt = skyrim.opt
 export default {
   name: "mint",
+  components:{
+    Loading
+  },
   props: ["hideMint"],
   data() {
     return {
       synAmount: "0",
       enabled: false,
       willLock: "0",
+      loading: false,
     }
   },
 
@@ -79,24 +93,31 @@ export default {
   },
 
   mounted() {
-    opt.syntheticEnabled(syntheticAddr)
-    .then(r=>{
-      if(r) {
-        this.enabled = true
-      }
-    })
-    .catch(e=>{})
+    setTimeout(_=>{
+      opt.syntheticEnabled(syntheticAddr)
+              .then(r=>{
+                if(r) {
+                  this.enabled = true
+                }
+              })
+              .catch(e=>{})
+    }, 500)
+
   },
 
   methods: {
     async enableMint() {
+      this.loading = true
       let enabled = await opt.syntheticEnabled(syntheticAddr)
       if(enabled) {
         this.enabled = true
+        this.loading = false
         return
       }
 
-      opt.enableSynthetic(syntheticAddr)
+      let _ = await opt.enableSynthetic(syntheticAddr)
+      this.enabled = false
+      this.loading = false
     },
 
     async mint() {
@@ -106,19 +127,30 @@ export default {
         return
       }
 
+      this.loading = true
       let validMint = await opt.hasEnoughToLock(syntheticAddr, this.synAmount)
       if(!validMint) {
-        //todo: tell user dos not has enough SNS to lock
+        setTimeout(_=>{
+          this.$notification.open({
+            message: 'Invalid Mint!',
+            description: "SNS insufficient",
+            duration: 0,
+          });
+          this.loading = false
+        }, 400)
+
         return
       }
 
       let mintResult = await opt.mint(syntheticAddr, this.synAmount)
+
       if(mintResult !== null){
         console.log("mint transaction send success, tx hash is: ", mintResult)
       } else {
         //user cancel or other unknown things happened, do nothing
       }
 
+      this.loading = false
       if(typeof this.hideMint === "function") {
         this.hideMint()
       }

@@ -19,7 +19,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-6 text-left notes-txt">
+        <div class="col-12 text-left notes-txt">
           Unlock: {{willUnlock}} SNX
         </div>
         <!--        <div class="col-6 text-right notes-txt">-->
@@ -39,22 +39,35 @@
         </div>
       </div>
     </div>
+
+    <loading :active.sync="loading"
+             :can-cancel="false"
+             :is-full-page="true"></loading>
   </div>
 </template>
 
 <script>
 import skyrim from "../../utils/skyrim/skyrim";
 import {syntheticAddr} from "../../utils/skyrim/constant";
+// Import component
+import Loading from 'vue-loading-overlay';
+// Import stylesheet
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 let opt = skyrim.opt
 export default {
   name: "Burn",
   props: ["hideBurn"],
 
+  components: {
+    Loading
+  },
+
   data(){
     return {
       burnAmount: "0",
       willUnlock: "0",
+      loading: false,
     }
   },
 
@@ -71,9 +84,15 @@ export default {
     async burn() {
       let snsAmount = await opt.synToSNS(syntheticAddr, this.burnAmount)
 
-      let validUnlock = await opt.validUnlock(syntheticAddr, snsAmount)
-      if(!validUnlock) {
-        //todo: tell user unlock not valid
+      this.loading = true
+      let validUnlock = await opt.verifyUnlock(syntheticAddr, snsAmount)
+      if(true !== validUnlock) {
+        this.loading = false
+        this.$notification.open({
+          message: 'Invalid Burn!',
+          description: validUnlock,
+          duration: 0,
+        });
         return
       }
 
@@ -84,6 +103,7 @@ export default {
         //user cancel or other unknown things happened, do nothing
       }
 
+      this.loading = false
       if(typeof this.hideBurn === "function") {
         this.hideBurn()
       }
