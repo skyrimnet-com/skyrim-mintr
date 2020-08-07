@@ -81,7 +81,7 @@
       <div class="col">
         <a
           class="go-to-uniswap-txt"
-          href="https://app.uniswap.org/#/swap?inputCurrency=0x8e3c8e2de3cced6250b4ec129a82af4d2d3cbc5f" target="_blank"
+          :href="$t('links.uniswapTrade')" target="_blank"
         >{{ $t("dashboard.wallet.uniswap") }}</a
         >
       </div>

@@ -9,7 +9,7 @@
       <div class="row">
         <div class="col">
           <p class="mint-tit">{{ $t("action.mint") }}</p>
-          <p class="mint-txt">{{ $t("dashboard.mint.txt") }}}</p>
+          <p class="mint-txt">{{ $t("dashboard.mint.txt") }}</p>
         </div>
       </div>
       <div class="row">

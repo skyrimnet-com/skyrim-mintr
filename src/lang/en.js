@@ -20,6 +20,7 @@ export default {
     twitter: "https://twitter.com/skyrimnet",
     medium: "https://medium.com/@skyrimnetworkSNS",
     uniswap: "https://uniswap.info/token/0x8e3c8e2de3cced6250b4ec129a82af4d2d3cbc5f",
+    uniswapTrade: "https://app.uniswap.org/#/swap?inputCurrency=0x8e3c8e2de3cced6250b4ec129a82af4d2d3cbc5f",
   },
   token: {
     name: "SNS",
